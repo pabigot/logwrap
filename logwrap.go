@@ -44,17 +44,18 @@ const (
 // configuration.
 type Logger interface {
 	// SetId adds an identification string to the start of each emitted
-	// message.
+	// message.  By default the logger assumes it has no identifier
+	// assigned.
 	SetId(id string) Logger
-
-	// SetPriority specifies the priority used to filter emitted messages.
-	SetPriority(pri Priority) Logger
 
 	// Priority returns the priority of the lowest priority message that
 	// will be emitted to the log.  E.g. if set to Warning, Error and
 	// Warning messages will be logged, but Notice and Info messages will
-	// be dropped.
+	// be dropped.  The default Priority() shall be Warning.
 	Priority() Priority
+
+	// SetPriority specifies the priority used to filter emitted messages.
+	SetPriority(pri Priority) Logger
 
 	// F formats a message and emits it to the log, as long as the
 	// provided priority is at or above Priority() in precedence.
@@ -66,6 +67,9 @@ type Logger interface {
 // injected into a package in a way that ensures active objects created by the
 // package are provided with a custom log before any goroutines associated
 // with the object are started.
+//
+// Unless a LogMaker specifies otherwise the defaults for created Logger
+// instances should be the same: no identifier assigned, priority is Warning.
 type LogMaker func(owner interface{}) Logger
 
 // NullLogMaker returns a Logger that drops all messages sent to it.
