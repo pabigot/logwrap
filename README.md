@@ -3,8 +3,8 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Go Doc](https://pkg.go.dev/badge/github.com/pabigot/logwrap.svg)](https://pkg.go.dev/github.com/pabigot/logwrap)
 [![Go Report Card](https://goreportcard.com/badge/github.com/pabigot/logwrap)](https://goreportcard.com/report/github.com/pabigot/logwrap)
-[![Build Status](https://github.com/pabigot/logwrap/actions/workflows/core.yml/badge.svg?branch=main)](https://github.com/pabigot/logwrap/actions/workflows/core.yml)
-[![Coverage Status](https://coveralls.io/repos/github/pabigot/logwrap/badge.svg?branch=main)](https://coveralls.io/github/pabigot/logwrap?branch=main)
+[![Build Status](https://github.com/pabigot/logwrap/actions/workflows/core.yml/badge.svg)](https://github.com/pabigot/logwrap/actions/workflows/core.yml)
+[![Coverage Status](https://coveralls.io/repos/github/pabigot/logwrap/badge.svg)](https://coveralls.io/github/pabigot/logwrap)
 
 Package logwrap provides a very basic abstraction supporting
 syslog-style filterable prioritized string messages.  Logger instances
