@@ -38,6 +38,26 @@ const (
 	Debug
 )
 
+func (p Priority) String() string {
+	switch p {
+	case Emerg:
+		return "Emerg"
+	case Crit:
+		return "Crit"
+	case Error:
+		return "Error"
+	case Warning:
+		return "Warning"
+	case Notice:
+		return "Notice"
+	case Info:
+		return "Info"
+	case Debug:
+		return "Debug"
+	}
+	panic("unhandled Priority")
+}
+
 // Logger provides the key functionality for filterable prioritized text log
 // messages.  Types that implement this interface may provide an Instance()
 // method that exposes the underlying log object for logger-specific
