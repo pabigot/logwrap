@@ -1,4 +1,4 @@
-// Copyright 2021 Peter Bigot Consulting, LLC
+// Copyright 2021-2022 Peter Bigot Consulting, LLC
 // SPDX-License-Identifier: Apache-2.0
 
 // Package logwrap provides a very basic abstraction supporting syslog-style
@@ -16,25 +16,25 @@ import (
 	"os"
 )
 
-// Priority distinguishs log message priority.  Higher priority messages have
+// Priority distinguishes log message priority.  Higher priority messages have
 // lower numeric value.  Priority levels derive from the classic syslog(3)
 // taxonomy.
 type Priority int32
 
 const (
-	// The system is unusable
+	// Emerg means the system is unusable
 	Emerg Priority = iota
-	// Critical conditions
+	// Crit identifies critical conditions
 	Crit
 	// Error conditions
 	Error
 	// Warning conditions
 	Warning
-	// Normal but significate
+	// Notice identifies normal but significant conditions
 	Notice
-	// Informational
+	// Info identifies informational messages
 	Info
-	// Debugging
+	// Debug is used for debugging
 	Debug
 )
 
@@ -120,26 +120,26 @@ var priMap = map[Priority]string{
 	Debug:   "D",
 }
 
-// Implement Logger.  The provided id becomes the log.Logger prefix, and
-// log.Lmsgprefix is applied to the flags.
+// SetId per Logger.  The provided id becomes the log.Logger prefix,
+// and log.Lmsgprefix is applied to the flags.
 func (v *LogLogger) SetId(id string) Logger {
 	v.lgr.SetFlags(v.lgr.Flags() | log.Lmsgprefix)
 	v.lgr.SetPrefix(id)
 	return v
 }
 
-// Implement Logger.
+// SetPriority per Logger.
 func (v *LogLogger) SetPriority(pri Priority) Logger {
 	v.pri = pri
 	return v
 }
 
-// Implement Logger.
+// Priority per Logger.
 func (v *LogLogger) Priority() Priority {
 	return v.pri
 }
 
-// Implement Logger.  Priorities are represented in the messages as the first
+// F per Logger.  Priorities are represented in the messages as the first
 // letter of the priority (or '!' for Emerg) within square brackets prefixing
 // the formatted message.
 func (v *LogLogger) F(pri Priority, format string, args ...interface{}) {

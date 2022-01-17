@@ -1,4 +1,4 @@
-// Copyright 2021 Peter Bigot Consulting, LLC
+// Copyright 2021-2022 Peter Bigot Consulting, LLC
 // SPDX-License-Identifier: Apache-2.0
 
 package logwrap
@@ -40,7 +40,6 @@ func TestLogLogger(t *testing.T) {
 		t.Errorf("failed to set priority: %d", int(p))
 	}
 	lgr.F(Debug, "debug at debug priority: you see this, right?")
-
 }
 
 func TestNullLogger(t *testing.T) {
