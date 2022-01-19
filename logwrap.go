@@ -80,23 +80,23 @@ func NullLogMaker(interface{}) Logger {
 
 type nullLogger Priority
 
-// Implement Logger.
+// SetId per Logger.
 func (v *nullLogger) SetId(id string) Logger {
 	return v
 }
 
-// Implement Logger.
+// SetPriority per Logger.
 func (v *nullLogger) SetPriority(pri Priority) Logger {
 	*v = nullLogger(pri)
 	return v
 }
 
-// Implement Logger.
+// Priority per Logger.
 func (v *nullLogger) Priority() Priority {
 	return Priority(*v)
 }
 
-// Implement Logger.
+// F per Logger.
 func (v *nullLogger) F(pri Priority, format string, args ...interface{}) {}
 
 // LogLogger uses a dedicated instance of log.Logger.
@@ -105,8 +105,9 @@ type LogLogger struct {
 	pri Priority
 }
 
-// LogLogMaker returns a Logger that uses the core log package to emit
-// messages via the Print API.  The initial priority is Warning.
+// LogLogMaker returns a Logger that uses a dedicated instance of the core
+// log.Logger type to emit messages via the Print API.  The initial priority
+// is Warning.
 func LogLogMaker(interface{}) Logger {
 	return &LogLogger{
 		lgr: log.New(os.Stderr, "", log.LstdFlags),
