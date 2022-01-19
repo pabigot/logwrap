@@ -4,9 +4,29 @@
 package logwrap
 
 import (
+	"errors"
 	"log"
+	"strings"
 	"testing"
 )
+
+// Run standard verification of expected errors, i.e. that err is an
+// error and its text contains errstr.
+func confirmError(t *testing.T, err error, base error, errstr string) {
+	t.Helper()
+	if err == nil {
+		t.Fatalf("succeed, expected error %s", errstr)
+	}
+	if base != nil && !errors.Is(err, base) {
+		t.Fatalf("err not from %s: %s", base, err)
+	}
+	if testing.Verbose() {
+		t.Logf("Error=`%v`", err.Error())
+	}
+	if !strings.Contains(err.Error(), errstr) {
+		t.Fatalf("failed, missing %s: %v", errstr, err)
+	}
+}
 
 func TestLogLogger(t *testing.T) {
 	lgr := LogLogMaker(nil)
@@ -83,4 +103,13 @@ func TestParsePriority(t *testing.T) {
 	if _, ok := ParsePriority("wrn"); ok {
 		t.Error("Improper success")
 	}
+}
+
+func TestSet(t *testing.T) {
+	var pri Priority
+	if err := (&pri).Set("debug"); err != nil || pri != Debug {
+		t.Errorf("Set failed: %s, %v", pri, err)
+	}
+	err := pri.Set("fatal")
+	confirmError(t, err, ErrInvalidPriority, "invalid priority: fatal")
 }

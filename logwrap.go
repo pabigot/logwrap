@@ -11,6 +11,7 @@
 package logwrap
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -37,6 +38,12 @@ const (
 	Info
 	// Debug is used for debugging
 	Debug
+)
+
+var (
+	// ErrInvalidPriority indicates that Set() was invoked with an
+	// incorrect text representation of a priority.
+	ErrInvalidPriority = errors.New("invalid priority")
 )
 
 func (p Priority) String() string {
@@ -165,6 +172,16 @@ func ParsePriority(s string) (pri Priority, ok bool) {
 		pri = Info
 	case "debug":
 		pri = Debug
+	}
+	return
+}
+
+// Set a priority variable from a string.  This supports flag.Value.
+func (p *Priority) Set(s string) (err error) {
+	if pri, ok := ParsePriority(s); ok {
+		*p = pri
+	} else {
+		err = fmt.Errorf("%w: %s", ErrInvalidPriority, s)
 	}
 	return
 }
