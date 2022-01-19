@@ -2,7 +2,13 @@
 
 ## [Unreleased]
 
-## 0.0.2 - 2022-01-17
+## [v0.0.3] - 2022-01-19
+
+* Add Stringer support to Priority as the numeric values are not meaningful.
+* Add ParsePriority to identify a Priority by name.
+* Document expected default behavior of new Logger instances.
+
+## [v0.0.2] - 2022-01-17
 
 * Non-functional code cleanup, github workflows for testing and
   coverage, basic README and CHANGELOG.
@@ -13,4 +19,5 @@
   documentation.
 
 [Unreleased]: https://github.com/pabigot/logwrap/compare/main...next
-[0.0.2]: https://github.com/pabigot/logwrap/compare/v0.0.1...v0.0.2
+[v0.0.2]: https://github.com/pabigot/logwrap/compare/v0.0.1...v0.0.2
+[v0.0.3]: https://github.com/pabigot/logwrap/compare/v0.0.2...v0.0.3
