@@ -56,3 +56,31 @@ func TestNullLogger(t *testing.T) {
 	// SetId should work but have no effect.
 	lgr.SetId("id")
 }
+
+func TestParsePriority(t *testing.T) {
+	type testCase struct {
+		pri    Priority
+		inputs []string
+	}
+	testCases := []testCase{
+		testCase{Emerg, []string{Emerg.String(), "EmeRgenCY", "emerg"}},
+		testCase{Crit, []string{Crit.String(), "critical", "CRIT"}},
+		testCase{Error, []string{Error.String(), "error"}},
+		testCase{Warning, []string{Warning.String(), "wARN", "Warning"}},
+		testCase{Notice, []string{Notice.String(), "Notice"}},
+		testCase{Info, []string{Info.String(), "info"}},
+		testCase{Debug, []string{Debug.String(), "DeBug"}},
+	}
+
+	for _, tc := range testCases {
+		for _, s := range tc.inputs {
+			if pri, ok := ParsePriority(s); pri != tc.pri || !ok {
+				t.Errorf("Failed %s = %s: %s %t",
+					s, tc.pri, pri, ok)
+			}
+		}
+	}
+	if _, ok := ParsePriority("wrn"); ok {
+		t.Error("Improper success")
+	}
+}
