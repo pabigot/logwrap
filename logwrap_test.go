@@ -63,13 +63,13 @@ func TestParsePriority(t *testing.T) {
 		inputs []string
 	}
 	testCases := []testCase{
-		testCase{Emerg, []string{Emerg.String(), "EmeRgenCY", "emerg"}},
-		testCase{Crit, []string{Crit.String(), "critical", "CRIT"}},
-		testCase{Error, []string{Error.String(), "error"}},
-		testCase{Warning, []string{Warning.String(), "wARN", "Warning"}},
-		testCase{Notice, []string{Notice.String(), "Notice"}},
-		testCase{Info, []string{Info.String(), "info"}},
-		testCase{Debug, []string{Debug.String(), "DeBug"}},
+		{Emerg, []string{Emerg.String(), "EmeRgenCY", "emerg"}},
+		{Crit, []string{Crit.String(), "critical", "CRIT"}},
+		{Error, []string{Error.String(), "error"}},
+		{Warning, []string{Warning.String(), "wARN", "Warning"}},
+		{Notice, []string{Notice.String(), "Notice"}},
+		{Info, []string{Info.String(), "info"}},
+		{Debug, []string{Debug.String(), "DeBug"}},
 	}
 
 	for _, tc := range testCases {
