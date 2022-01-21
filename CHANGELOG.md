@@ -18,7 +18,7 @@
 * Non-functional code cleanup, github workflows for testing and
   coverage, basic README and CHANGELOG.
 
-## 0.0.1 - 2022-01-16
+## v0.0.1 - 2022-01-16
 
 * Initial release with all code, lacking Github actions and non-code
   documentation.
