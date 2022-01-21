@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [v0.0.4] - 2022-01-21
+
+* Support flag.Value API to set priorities from application arguments.
+* Add golangci-lint to workflows.
+
 ## [v0.0.3] - 2022-01-19
 
 * Add Stringer support to Priority as the numeric values are not meaningful.
@@ -21,3 +26,4 @@
 [Unreleased]: https://github.com/pabigot/logwrap/compare/main...next
 [v0.0.2]: https://github.com/pabigot/logwrap/compare/v0.0.1...v0.0.2
 [v0.0.3]: https://github.com/pabigot/logwrap/compare/v0.0.2...v0.0.3
+[v0.0.4]: https://github.com/pabigot/logwrap/compare/v0.0.3...v0.0.4
