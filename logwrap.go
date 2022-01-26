@@ -99,6 +99,18 @@ func ParsePriority(s string) (pri Priority, ok bool) {
 	return
 }
 
+// Logf is the signature for a printf-like function.  Here it's one that's
+// bound to a logger and a priority.
+type Logf func(format string, args ...interface{})
+
+// MakePriWrapper creates Logf functions bound to the given logger and
+// priority.
+func MakePriWrapper(lgr Logger, pri Priority) Logf {
+	return func(format string, args ...interface{}) {
+		lgr.F(pri, format, args...)
+	}
+}
+
 // Logger provides the key functionality for filterable prioritized text log
 // messages.  Types that implement this interface may provide an Instance()
 // method that exposes the underlying log object for logger-specific

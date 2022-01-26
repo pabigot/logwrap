@@ -5,6 +5,7 @@ package logwrap
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"strings"
 	"testing"
@@ -126,4 +127,29 @@ func TestSet(t *testing.T) {
 	}
 	err := pri.Set("fatal")
 	confirmError(t, err, ErrInvalidPriority, "invalid priority: fatal")
+}
+
+func TestMakePriWrapper(t *testing.T) {
+	var sb strings.Builder
+	lgr := LogLogMaker(nil)
+	lgr.SetId("ID ")
+	priorities := []Priority{
+		Emerg, Debug, Crit, Info, Error, Notice, Warning,
+	}
+
+	lgr.(*LogLogger).Instance().SetOutput(&sb)
+	lgr.SetPriority(Debug)
+
+	for i, pri := range priorities {
+		plgr := MakePriWrapper(lgr, pri)
+		plgr("Test %d", i)
+		exp := fmt.Sprintf("ID [%s] Test %d\n", priMap[pri], i)
+		out := sb.String()
+		sb.Reset()
+		t.Logf("%s => %s", pri, out)
+		if !strings.HasSuffix(out, exp) {
+			t.Errorf("%s failed: %s", pri, out)
+		}
+		sb.Reset()
+	}
 }
