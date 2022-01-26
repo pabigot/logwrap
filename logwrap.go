@@ -66,6 +66,39 @@ func (p Priority) String() string {
 	panic("unhandled Priority")
 }
 
+// ParsePriority accepts strings of any case corresponding to Priority
+// identifiers and returns the corresponding Priority value paired with true.
+// If the string does not identify a priority the returned boolean will be
+// false.
+func ParsePriority(s string) (pri Priority, ok bool) {
+	ok = true
+	switch strings.ToLower(s) {
+	default:
+		ok = false
+	case "emergency":
+		fallthrough
+	case "emerg":
+		pri = Emerg
+	case "critical":
+		fallthrough
+	case "crit":
+		pri = Crit
+	case "error":
+		pri = Error
+	case "warn":
+		fallthrough
+	case "warning":
+		pri = Warning
+	case "notice":
+		pri = Notice
+	case "info":
+		pri = Info
+	case "debug":
+		pri = Debug
+	}
+	return
+}
+
 // Logger provides the key functionality for filterable prioritized text log
 // messages.  Types that implement this interface may provide an Instance()
 // method that exposes the underlying log object for logger-specific
@@ -141,39 +174,6 @@ func LogLogMaker(interface{}) Logger {
 		lgr: log.New(os.Stderr, "", log.LstdFlags),
 		pri: Warning,
 	}
-}
-
-// ParsePriority accepts strings of any case corresponding to Priority
-// identifiers and returns the corresponding Priority value paired with true.
-// If the string does not identify a priority the returned boolean will be
-// false.
-func ParsePriority(s string) (pri Priority, ok bool) {
-	ok = true
-	switch strings.ToLower(s) {
-	default:
-		ok = false
-	case "emergency":
-		fallthrough
-	case "emerg":
-		pri = Emerg
-	case "critical":
-		fallthrough
-	case "crit":
-		pri = Crit
-	case "error":
-		pri = Error
-	case "warn":
-		fallthrough
-	case "warning":
-		pri = Warning
-	case "notice":
-		pri = Notice
-	case "info":
-		pri = Info
-	case "debug":
-		pri = Debug
-	}
-	return
 }
 
 // Set a priority variable from a string.  This supports flag.Value.
