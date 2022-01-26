@@ -3,10 +3,10 @@
 
 // Package logwrap provides a very basic abstraction supporting syslog-style
 // filterable prioritized string messages.  Logger instances can be created
-// for specific objects or roles, which can specify an identifier for
+// for specific objects or roles, and can specify an identifier for
 // themselves.
 //
-// The use case is helper packages which should emit log messages with the
+// The use case is helper packages that should emit log messages with the
 // same tool as the application itself.
 package logwrap
 
