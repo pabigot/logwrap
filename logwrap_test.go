@@ -29,8 +29,8 @@ func confirmError(t *testing.T, err error, base error, errstr string) {
 }
 
 func TestLogLogger(t *testing.T) {
+	var sb strings.Builder
 	lgr := LogLogMaker(nil)
-	lgr.F(Emerg, "made it this far")
 
 	wrapped, ok := lgr.(*LogLogger)
 	if !ok {
@@ -42,24 +42,38 @@ func TestLogLogger(t *testing.T) {
 		t.Errorf("Init flags %x not %x", v, log.LstdFlags)
 	}
 
+	inst.SetOutput(&sb)
+
 	lgr.SetId("TestLogLogger ")
 	if v := inst.Flags(); v != log.LstdFlags|log.Lmsgprefix {
 		t.Errorf("SetId did not enable Lmsgprefix: %x", v)
 	}
 
 	lgr.F(Warning, "with prefix")
+	if lv := sb.String(); !strings.HasSuffix(lv, "TestLogLogger [W] with prefix\n") {
+		t.Errorf("bad warning: %s", lv)
+	}
+	sb.Reset()
 
 	if p := lgr.Priority(); p != Warning {
 		t.Errorf("unexpected init priority: %d", int(p))
 	}
-	lgr.F(Debug, "debug at Warning priority: you don't see this, right?")
+	lgr.F(Debug, "debug at Warning priority")
+	if lv := sb.String(); lv != "" {
+		t.Errorf("bad filtered debug: %s", lv)
+	}
+	sb.Reset()
 
 	// The null logger retains its configured priority even though it
 	// isn't used, for consistent behavior with other loggers.
 	if p := lgr.SetPriority(Debug).Priority(); p != Debug {
 		t.Errorf("failed to set priority: %d", int(p))
 	}
-	lgr.F(Debug, "debug at debug priority: you see this, right?")
+	lgr.F(Debug, "debug at debug priority")
+	if lv := sb.String(); !strings.HasSuffix(lv, "TestLogLogger [D] debug at debug priority\n") {
+		t.Errorf("bad warning: %s", lv)
+	}
+	sb.Reset()
 }
 
 func TestNullLogger(t *testing.T) {
