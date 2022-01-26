@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [v0.0.5] - 2022-01-26
+
+* Fix testing to be automatable.
+* Add MakePriLogger to create helper functions with bound logger and
+  priority.
+
 ## [v0.0.4] - 2022-01-21
 
 * Support flag.Value API to set priorities from application arguments.
@@ -27,3 +33,4 @@
 [v0.0.2]: https://github.com/pabigot/logwrap/compare/v0.0.1...v0.0.2
 [v0.0.3]: https://github.com/pabigot/logwrap/compare/v0.0.2...v0.0.3
 [v0.0.4]: https://github.com/pabigot/logwrap/compare/v0.0.3...v0.0.4
+[v0.0.5]: https://github.com/pabigot/logwrap/compare/v0.0.4...v0.0.5
