@@ -135,6 +135,16 @@ type Logger interface {
 	F(pri Priority, format string, args ...interface{})
 }
 
+// LogOwner indicates that the implementing object owns a Logger, and provides
+// ways to access its priority.
+type LogOwner interface {
+	// LogPriority returns the priority of an owned Logger.
+	LogPriority() Priority
+
+	// LogSetPriority changes the priority of an owned Logger.
+	LogSetPriority(pri Priority)
+}
+
 // A LogMaker is a factory function that constructs a logger instance for some
 // object or operation.  It allows the selection of a log infrastructure to be
 // injected into a package in a way that ensures active objects created by the

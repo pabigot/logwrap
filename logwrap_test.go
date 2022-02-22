@@ -153,3 +153,31 @@ func TestMakePriWrapper(t *testing.T) {
 		sb.Reset()
 	}
 }
+
+type logOwner struct {
+	lgr Logger
+}
+
+func (lo *logOwner) LogPriority() Priority {
+	return lo.lgr.Priority()
+}
+
+func (lo *logOwner) LogSetPriority(pri Priority) {
+	lo.lgr.SetPriority(pri)
+}
+
+func TestLogOwner(t *testing.T) {
+	lo := &logOwner{
+		lgr: LogLogMaker(nil),
+	}
+	lo.lgr.SetId("owned")
+
+	var ilo LogOwner = lo
+	if lp := ilo.LogPriority(); lp != Warning {
+		t.Fatalf("bad init prio: %s", lp)
+	}
+	lo.LogSetPriority(Debug)
+	if lp := ilo.LogPriority(); lp != Debug {
+		t.Fatalf("bad changed prio: %s", lp)
+	}
+}
