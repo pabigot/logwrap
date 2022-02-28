@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [v0.0.6] - 2022-02-28
+
+* Add LogOwner interface to indicate support for getting/setting the
+  priority of an owned logger.
+* Add example of using LogMaker and MakePriLogger.
+
 ## [v0.0.5] - 2022-01-26
 
 * Fix testing to be automatable.
@@ -34,3 +40,4 @@
 [v0.0.3]: https://github.com/pabigot/logwrap/compare/v0.0.2...v0.0.3
 [v0.0.4]: https://github.com/pabigot/logwrap/compare/v0.0.3...v0.0.4
 [v0.0.5]: https://github.com/pabigot/logwrap/compare/v0.0.4...v0.0.5
+[v0.0.6]: https://github.com/pabigot/logwrap/compare/v0.0.5...v0.0.6
