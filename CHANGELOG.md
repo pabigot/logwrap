@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [v0.0.7] - 2022-03-01
+* Add Enables method on Priority, to allow applications to check whether
+  a Logger will process a message at a given priority before collecting
+  the information that would be in such a message.
+
 ## [v0.0.6] - 2022-02-28
 
 * Add LogOwner interface to indicate support for getting/setting the
@@ -41,3 +46,4 @@
 [v0.0.4]: https://github.com/pabigot/logwrap/compare/v0.0.3...v0.0.4
 [v0.0.5]: https://github.com/pabigot/logwrap/compare/v0.0.4...v0.0.5
 [v0.0.6]: https://github.com/pabigot/logwrap/compare/v0.0.5...v0.0.6
+[v0.0.7]: https://github.com/pabigot/logwrap/compare/v0.0.6...v0.0.7
