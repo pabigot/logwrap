@@ -99,6 +99,13 @@ func ParsePriority(s string) (pri Priority, ok bool) {
 	return
 }
 
+// Enables returns true if and only if a logger set to the receiver's priority
+// should emit log messages at priority p2.  For example Info.Enables(Crit) is
+// true, but Warning.Enables(Debug) is false.
+func (p Priority) Enables(p2 Priority) bool {
+	return p2 <= p
+}
+
 // Logf is the signature for a printf-like function.  Here it's one that's
 // bound to a logger and a priority.
 type Logf func(format string, args ...interface{})
@@ -241,7 +248,7 @@ func (v *LogLogger) Priority() Priority {
 // letter of the priority (or '!' for Emerg) within square brackets prefixing
 // the formatted message.
 func (v *LogLogger) F(pri Priority, format string, args ...interface{}) {
-	if pri <= v.pri {
+	if v.pri.Enables(pri) {
 		s := fmt.Sprintf(format, args...)
 		v.lgr.Printf("[%s] %s", priMap[pri], s)
 	}

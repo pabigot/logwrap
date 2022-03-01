@@ -120,6 +120,15 @@ func TestParsePriority(t *testing.T) {
 	}
 }
 
+func TestEnables(t *testing.T) {
+	if !Info.Enables(Crit) {
+		t.Errorf("enables wrong for Info.Crit")
+	}
+	if Warning.Enables(Debug) {
+		t.Errorf("enables wrong for Warning.Debug")
+	}
+}
+
 func TestSet(t *testing.T) {
 	var pri Priority
 	if err := (&pri).Set("debug"); err != nil || pri != Debug {
