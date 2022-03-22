@@ -2,7 +2,18 @@
 
 ## [Unreleased]
 
+## [v0.1.0] - 2022-03-22
+
+* Refactor interfaces to distinguish ImmutableLogger which is read-only
+  from Logger which retains the ability to set identifiers and priority.
+
+* Add ChanLogger that wraps a logger with a safe-for-concurrent-use F()
+  that forwards a packaged log instruction through a channel where it
+  can be emitted by the underlying logger in a context that's protected
+  from other goroutines.
+
 ## [v0.0.7] - 2022-03-01
+
 * Add Enables method on Priority, to allow applications to check whether
   a Logger will process a message at a given priority before collecting
   the information that would be in such a message.
@@ -47,3 +58,4 @@
 [v0.0.5]: https://github.com/pabigot/logwrap/compare/v0.0.4...v0.0.5
 [v0.0.6]: https://github.com/pabigot/logwrap/compare/v0.0.5...v0.0.6
 [v0.0.7]: https://github.com/pabigot/logwrap/compare/v0.0.6...v0.0.7
+[v0.1.0]: https://github.com/pabigot/logwrap/compare/v0.0.7...v0.1.0
