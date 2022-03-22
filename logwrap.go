@@ -265,3 +265,76 @@ func (v *LogLogger) SetPriority(pri Priority) Logger {
 func (v *LogLogger) Instance() *log.Logger {
 	return v.lgr
 }
+
+// ChanLogger is a ImmutableLogger that packages log messages and transmits them
+// over a channel where they can be emitted in a different goroutine.
+//
+// This allows an active object that owns a Logger to spawn goroutines that
+// can emit messages on that Logger even if the Logger is not safe for
+// concurrent use.
+//
+// ChanLogger's F() method is safe for concurrent use.  Its Priority() method
+// is not safe for concurrent use.
+type ChanLogger struct {
+	ech chan<- Emitter
+	lgr ImmutableLogger
+}
+
+// Emitter is implemented by encapsulated log messages, e.g. those sent by a
+// ChanLogger.
+type Emitter interface {
+	// Emit emits a log message based on information held by the
+	// implementing object.
+	Emit()
+}
+
+// MakeChanLogger constructs a channel and a ImmutableLogger such that
+// messages emitted by the ImmutableLogger are processed and emitted via lgr
+// in its native context.
+//
+// lgr can be any ImmutableLogger.  cap specifies the capacity of the channel
+// used to communicate messages.  Values of cap less than 1 are replaced by 1.
+//
+// Be sure to set cap appropriately so routines that use the ChanLogger will
+// not block because the routine responsible for processing messages from it
+// is delayed.
+//
+// The returned channel is never closed.
+func MakeChanLogger(lgr ImmutableLogger, cap int) (ImmutableLogger, <-chan Emitter) {
+	if cap < 1 {
+		cap = 1
+	}
+	ech := make(chan Emitter, cap)
+	return &ChanLogger{
+		ech: ech,
+		lgr: lgr,
+	}, ech
+}
+
+// Priority per ImmutableLogger
+func (v *ChanLogger) Priority() Priority {
+	return v.lgr.Priority()
+}
+
+// F per ImmutableLogger
+func (v *ChanLogger) F(pri Priority, format string, args ...interface{}) {
+	v.ech <- &emittable{
+		lgr:  v.lgr,
+		pri:  pri,
+		fmt:  format,
+		args: args,
+	}
+}
+
+// emittable packages the log message parameters with the logger to be used to
+// emit them.  It implements Emitter() to output the message.
+type emittable struct {
+	lgr  ImmutableLogger
+	pri  Priority
+	fmt  string
+	args []interface{}
+}
+
+func (m *emittable) Emit() {
+	m.lgr.F(m.pri, m.fmt, m.args...)
+}

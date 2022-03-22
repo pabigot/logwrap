@@ -190,3 +190,31 @@ func TestLogOwner(t *testing.T) {
 		t.Fatalf("bad changed prio: %s", lp)
 	}
 }
+
+func TestChanLogger(t *testing.T) {
+	var sb strings.Builder
+	blgr := LogLogMaker(nil)
+	blgr.(*LogLogger).Instance().SetOutput(&sb)
+
+	lgr, lch := MakeChanLogger(blgr, -1)
+	if v := cap(lch); v != 1 {
+		t.Errorf("cap not updated to 1: %d", v)
+	}
+	if lgr.Priority() != blgr.Priority() {
+		t.Errorf("priority not forwarded")
+	}
+
+	fmt := "format: %s %d"
+	lgr.F(Warning, fmt, "arg", 2)
+	if sb.Len() != 0 {
+		t.Error("premature log")
+	}
+	m := <-lch
+	if e, ok := m.(*emittable); !ok || e.lgr != blgr || e.pri != Warning || e.fmt != fmt || len(e.args) != 2 {
+		t.Error("wrong emittable content")
+	}
+	m.Emit()
+	if s := sb.String(); !strings.HasSuffix(s, " [W] format: arg 2\n") {
+		t.Errorf("wrong content: %s", s)
+	}
+}
