@@ -112,34 +112,40 @@ type Logf func(format string, args ...interface{})
 
 // MakePriWrapper creates Logf functions bound to the given logger and
 // priority.
-func MakePriWrapper(lgr Logger, pri Priority) Logf {
+func MakePriWrapper(lgr ImmutableLogger, pri Priority) Logf {
 	return func(format string, args ...interface{}) {
 		lgr.F(pri, format, args...)
 	}
 }
 
-// Logger provides the key functionality for filterable prioritized text log
-// messages.  Types that implement this interface may provide an Instance()
-// method that exposes the underlying log object for logger-specific
-// configuration.
-type Logger interface {
-	// SetId adds an identification string to the start of each emitted
-	// message.  By default the logger assumes it has no identifier
-	// assigned.
-	SetId(id string) Logger
-
+// ImmutableLogger provides the key functionality for emitting filterable
+// prioritized text log messages.
+type ImmutableLogger interface {
 	// Priority returns the priority of the lowest priority message that
 	// will be emitted to the log.  E.g. if set to Warning, Error and
 	// Warning messages will be logged, but Notice and Info messages will
 	// be dropped.  The default Priority() shall be Warning.
 	Priority() Priority
 
-	// SetPriority specifies the priority used to filter emitted messages.
-	SetPriority(pri Priority) Logger
-
 	// F formats a message and emits it to the log, as long as the
 	// provided priority is at or above Priority() in precedence.
 	F(pri Priority, format string, args ...interface{})
+}
+
+// Logger extends ImmutableLogger with methods that can be used to change its
+// priority and other behavior.  Types that implement this interface may
+// provide an Instance() method that exposes the underlying log object for
+// logger-specific configuration.
+type Logger interface {
+	ImmutableLogger
+
+	// SetId adds an identification string to the start of each emitted
+	// message.  By default the logger assumes it has no identifier
+	// assigned.
+	SetId(id string) Logger
+
+	// SetPriority specifies the priority used to filter emitted messages.
+	SetPriority(pri Priority) Logger
 }
 
 // LogOwner indicates that the implementing object owns a Logger, and provides
@@ -170,6 +176,14 @@ func NullLogMaker(interface{}) Logger {
 
 type nullLogger Priority
 
+// Priority per ImmutableLogger.
+func (v *nullLogger) Priority() Priority {
+	return Priority(*v)
+}
+
+// F per ImmutableLogger.
+func (v *nullLogger) F(pri Priority, format string, args ...interface{}) {}
+
 // SetId per Logger.
 func (v *nullLogger) SetId(id string) Logger {
 	return v
@@ -180,14 +194,6 @@ func (v *nullLogger) SetPriority(pri Priority) Logger {
 	*v = nullLogger(pri)
 	return v
 }
-
-// Priority per Logger.
-func (v *nullLogger) Priority() Priority {
-	return Priority(*v)
-}
-
-// F per Logger.
-func (v *nullLogger) F(pri Priority, format string, args ...interface{}) {}
 
 // LogLogger uses a dedicated instance of log.Logger.
 type LogLogger struct {
@@ -225,6 +231,21 @@ var priMap = map[Priority]string{
 	Debug:   "D",
 }
 
+// Priority per ImmutableLogger.
+func (v *LogLogger) Priority() Priority {
+	return v.pri
+}
+
+// F per ImmutableLogger.  Priorities are represented in the messages as the
+// first letter of the priority (or '!' for Emerg) within square brackets
+// prefixing the formatted message.
+func (v *LogLogger) F(pri Priority, format string, args ...interface{}) {
+	if v.pri.Enables(pri) {
+		s := fmt.Sprintf(format, args...)
+		v.lgr.Printf("[%s] %s", priMap[pri], s)
+	}
+}
+
 // SetId per Logger.  The provided id becomes the log.Logger prefix,
 // and log.Lmsgprefix is applied to the flags.
 func (v *LogLogger) SetId(id string) Logger {
@@ -237,21 +258,6 @@ func (v *LogLogger) SetId(id string) Logger {
 func (v *LogLogger) SetPriority(pri Priority) Logger {
 	v.pri = pri
 	return v
-}
-
-// Priority per Logger.
-func (v *LogLogger) Priority() Priority {
-	return v.pri
-}
-
-// F per Logger.  Priorities are represented in the messages as the first
-// letter of the priority (or '!' for Emerg) within square brackets prefixing
-// the formatted message.
-func (v *LogLogger) F(pri Priority, format string, args ...interface{}) {
-	if v.pri.Enables(pri) {
-		s := fmt.Sprintf(format, args...)
-		v.lgr.Printf("[%s] %s", priMap[pri], s)
-	}
 }
 
 // Instance provides access to the underlying log.Logger to configure things
