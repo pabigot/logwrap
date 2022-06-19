@@ -118,6 +118,70 @@ func MakePriWrapper(lgr ImmutableLogger, pri Priority) Logf {
 	}
 }
 
+// PriPr provides LogF implementations for each possible priority.
+//
+// This structure simplifies the common need for short-hand loggers at
+// different priorities within a routine.  Instead of doing:
+//
+//    ...
+//    fn(lgr)
+//    ...
+//
+//  func fn(lgr lw.Logger) {
+//    lprn := lw.MakePriWrapper(lgr, lw.Notice)
+//    lpri := lw.MakePriWrapper(lgr, lw.Info)
+//    lprd := lw.MakePriWrapper(lgr, lw.Debug)
+//    ...
+//    lprn("At notice")
+//    lpri("At info")
+//    ...
+//  }
+//
+// the application can use:
+//
+//    ...
+//    fn(MakePriPr(lgr))
+//    ...
+//
+//  func fn(lpr *lw.PriPr) {
+//    ...
+//    lpr.N("At notice")
+//    lpr.I("At info")
+//    ...
+//  }
+//
+// which avoids having to enable and disable creation of loggers based on
+// which levels are used in the routine.
+type PriPr struct {
+	// Em logs its arguments at Emerg priority.
+	Em Logf
+	// C logs its arguments at Crit priority.
+	C Logf
+	// E logs its arguments at Error priority.
+	E Logf
+	// W logs its arguments at Warning priority.
+	W Logf
+	// N logs its arguments at Notice priority.
+	N Logf
+	// I logs its arguments at Info priority.
+	I Logf
+	// D logs its arguments at Debug priority.
+	D Logf
+}
+
+// MakePriPri returns a PriPr structure that logs at each priority using lgr.
+func MakePriPr(lgr ImmutableLogger) PriPr {
+	return PriPr{
+		Em: MakePriWrapper(lgr, Emerg),
+		C:  MakePriWrapper(lgr, Crit),
+		E:  MakePriWrapper(lgr, Error),
+		W:  MakePriWrapper(lgr, Warning),
+		N:  MakePriWrapper(lgr, Notice),
+		I:  MakePriWrapper(lgr, Info),
+		D:  MakePriWrapper(lgr, Debug),
+	}
+}
+
 // ImmutableLogger provides the key functionality for emitting filterable
 // prioritized text log messages.
 type ImmutableLogger interface {

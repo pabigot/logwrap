@@ -163,6 +163,43 @@ func TestMakePriWrapper(t *testing.T) {
 	}
 }
 
+func TestMakePriPr(t *testing.T) {
+	var sb strings.Builder
+	lgr := LogLogMaker(nil)
+	lgr.SetId("ID ")
+
+	lgr.(*LogLogger).Instance().SetOutput(&sb)
+	lgr.SetPriority(Debug)
+	lpr := MakePriPr(lgr)
+
+	ck := func(t *testing.T, pri Priority) {
+		t.Helper()
+		exp := fmt.Sprintf("ID [%s] Test\n", priMap[pri])
+		out := sb.String()
+		sb.Reset()
+		t.Logf("%s => %s", pri, out)
+		if !strings.HasSuffix(out, exp) {
+			t.Errorf("%s failed: %s", pri, out)
+		}
+		sb.Reset()
+	}
+
+	lpr.Em("Test")
+	ck(t, Emerg)
+	lpr.D("Test")
+	ck(t, Debug)
+	lpr.C("Test")
+	ck(t, Crit)
+	lpr.I("Test")
+	ck(t, Info)
+	lpr.E("Test")
+	ck(t, Error)
+	lpr.N("Test")
+	ck(t, Notice)
+	lpr.W("Test")
+	ck(t, Warning)
+}
+
 type logOwner struct {
 	lgr Logger
 }
