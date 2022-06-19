@@ -204,8 +204,7 @@ type Logger interface {
 	ImmutableLogger
 
 	// SetId adds an identification string to the start of each emitted
-	// message.  By default the logger assumes it has no identifier
-	// assigned.
+	// message.  By default the logger has no identifier assigned.
 	SetId(id string) Logger
 
 	// SetPriority specifies the priority used to filter emitted messages.
@@ -363,7 +362,8 @@ type Emitter interface {
 // not block because the routine responsible for processing messages from it
 // is delayed.
 //
-// The returned channel is never closed.
+// The F method of the returned logger is safe for concurrent use.  The
+// returned channel is never closed.
 func MakeChanLogger(lgr ImmutableLogger, cap int) (ImmutableLogger, <-chan Emitter) {
 	if cap < 1 {
 		cap = 1
@@ -375,12 +375,12 @@ func MakeChanLogger(lgr ImmutableLogger, cap int) (ImmutableLogger, <-chan Emitt
 	}, ech
 }
 
-// Priority per ImmutableLogger
+// Priority per ImmutableLogger.
 func (v *ChanLogger) Priority() Priority {
 	return v.lgr.Priority()
 }
 
-// F per ImmutableLogger
+// F per ImmutableLogger.
 func (v *ChanLogger) F(pri Priority, format string, args ...interface{}) {
 	v.ech <- &emittable{
 		lgr:  v.lgr,
