@@ -329,22 +329,22 @@ func (v *LogLogger) Instance() *log.Logger {
 	return v.lgr
 }
 
-// ChanLogger is a ImmutableLogger that packages log messages and transmits them
+// chanLogger is a ImmutableLogger that packages log messages and transmits them
 // over a channel where they can be emitted in a different goroutine.
 //
 // This allows an active object that owns a Logger to spawn goroutines that
 // can emit messages on that Logger even if the Logger is not safe for
 // concurrent use.
 //
-// ChanLogger's F() method is safe for concurrent use.  Its Priority() method
+// chanLogger's F() method is safe for concurrent use.  Its Priority() method
 // is not safe for concurrent use.
-type ChanLogger struct {
+type chanLogger struct {
 	ech chan<- Emitter
 	lgr ImmutableLogger
 }
 
 // Emitter is implemented by encapsulated log messages, e.g. those sent by a
-// ChanLogger.
+// channel logger.
 type Emitter interface {
 	// Emit emits a log message based on information held by the
 	// implementing object.
@@ -358,9 +358,9 @@ type Emitter interface {
 // lgr can be any ImmutableLogger.  cap specifies the capacity of the channel
 // used to communicate messages.  Values of cap less than 1 are replaced by 1.
 //
-// Be sure to set cap appropriately so routines that use the ChanLogger will
-// not block because the routine responsible for processing messages from it
-// is delayed.
+// Be sure to set cap appropriately so routines that use the channel logger
+// will not block because the routine responsible for processing messages from
+// it is delayed.
 //
 // The F method of the returned logger is safe for concurrent use.  The
 // returned channel is never closed.
@@ -369,19 +369,19 @@ func MakeChanLogger(lgr ImmutableLogger, cap int) (ImmutableLogger, <-chan Emitt
 		cap = 1
 	}
 	ech := make(chan Emitter, cap)
-	return &ChanLogger{
+	return &chanLogger{
 		ech: ech,
 		lgr: lgr,
 	}, ech
 }
 
 // Priority per ImmutableLogger.
-func (v *ChanLogger) Priority() Priority {
+func (v *chanLogger) Priority() Priority {
 	return v.lgr.Priority()
 }
 
 // F per ImmutableLogger.
-func (v *ChanLogger) F(pri Priority, format string, args ...interface{}) {
+func (v *chanLogger) F(pri Priority, format string, args ...interface{}) {
 	v.ech <- &emittable{
 		lgr:  v.lgr,
 		pri:  pri,
