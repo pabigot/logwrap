@@ -32,10 +32,17 @@ type SubService struct {
 	lgr lw.Logger
 }
 
+// Example of a function that can be passed to a call to inject log
+// configuration into objects and functions.
 func logMaker(owner interface{}) lw.Logger {
+	// Create the logger instance using whatever framework the application
+	// depends on.
 	lgr := lw.LogLogMaker(owner)
 	ll := lgr.(*lw.LogLogger).Instance()
 	ll.SetFlags(ll.Flags() & ^(log.Ldate | log.Ltime))
+
+	// Customize priority, identifier, and other options based on the
+	// context that uses the logger.
 	switch v := owner.(type) {
 	case *Service:
 		lgr.SetPriority(svcPri)
@@ -48,10 +55,11 @@ func logMaker(owner interface{}) lw.Logger {
 	default:
 		lgr.SetPriority(lw.Notice)
 	}
-	// TEST: mask variable output
 	return lgr
 }
 
+// This constructs and initializes its logs using the injected function to set
+// default parameters including the initial level.
 func NewService(id string, newLog lw.LogMaker) *Service {
 	rv := &Service{
 		id: id,
@@ -75,31 +83,27 @@ func newSubService(id string, newLog lw.LogMaker) *SubService {
 }
 
 func (s *Service) main() {
-	lprn := lw.MakePriWrapper(s.lgr, lw.Notice)
-	lpri := lw.MakePriWrapper(s.lgr, lw.Info)
-	lprd := lw.MakePriWrapper(s.lgr, lw.Debug)
-	lprn("Starting subservice %s", s.ss.id)
+	lpr := lw.MakePriPr(s.lgr)
+	lpr.N("Starting subservice %s", s.ss.id)
 	s.wg.Add(1)
 	go s.ss.main(s)
-	lpri("Started, waiting for sync")
+	lpr.I("Started, waiting for sync")
 	ss := <-s.ch
-	lpri("Sync from %s\n", ss.id)
-	lprd("Debug")
-	lprn("Gone")
+	lpr.I("Sync from %s\n", ss.id)
+	lpr.D("Debug")
+	lpr.N("Gone")
 	s.wg.Done()
 	close(s.ch)
 }
 
 func (ss *SubService) main(s *Service) {
-	lprn := lw.MakePriWrapper(ss.lgr, lw.Notice)
-	lpri := lw.MakePriWrapper(ss.lgr, lw.Info)
-	lprd := lw.MakePriWrapper(ss.lgr, lw.Debug)
-	lprn("Started subservice")
+	lpr := lw.MakePriPr(ss.lgr)
+	lpr.N("Started subservice")
 	s.ch <- ss
 	<-s.ch
-	lpri("Notified service")
-	lprd("Debug")
-	lprn("Gone")
+	lpr.I("Notified service")
+	lpr.D("Debug")
+	lpr.N("Gone")
 	s.wg.Done()
 }
 
