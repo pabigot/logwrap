@@ -340,6 +340,7 @@ func (v *LogLogger) Instance() *log.Logger {
 // is not safe for concurrent use.
 type chanLogger struct {
 	ech chan<- Emitter
+	pfx string
 	lgr ImmutableLogger
 }
 
@@ -375,6 +376,24 @@ func MakeChanLogger(lgr ImmutableLogger, cap int) (ImmutableLogger, <-chan Emitt
 	}, ech
 }
 
+// PrefixedChanLogger constructs a new ImmutableLogger that uses the same
+// channel as lgr, but prepends pfx to all format strings passed to the
+// returned logger's F function.  This simplifies ensuring that messages can
+// be tracked back to the goroutine that produced them.
+//
+// The returned ImmutableLogger is nil if lgr was not constructed by
+// MakeChanLogger.  Calls to the F method of the nil logger will silently drop
+// all messages submitted to it.
+func PrefixedChanLogger(lgr ImmutableLogger, pfx string) ImmutableLogger {
+	var rv *chanLogger
+	if cl, ok := lgr.(*chanLogger); ok {
+		cl2 := *cl
+		cl2.pfx = pfx
+		rv = &cl2
+	}
+	return rv
+}
+
 // Priority per ImmutableLogger.
 func (v *chanLogger) Priority() Priority {
 	return v.lgr.Priority()
@@ -382,11 +401,13 @@ func (v *chanLogger) Priority() Priority {
 
 // F per ImmutableLogger.
 func (v *chanLogger) F(pri Priority, format string, args ...interface{}) {
-	v.ech <- &emittable{
-		lgr:  v.lgr,
-		pri:  pri,
-		fmt:  format,
-		args: args,
+	if v != nil {
+		v.ech <- &emittable{
+			lgr:  v.lgr,
+			pri:  pri,
+			fmt:  v.pfx + format,
+			args: args,
+		}
 	}
 }
 

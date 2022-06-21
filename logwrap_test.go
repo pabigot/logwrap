@@ -254,4 +254,29 @@ func TestChanLogger(t *testing.T) {
 	if s := sb.String(); !strings.HasSuffix(s, " [W] format: arg 2\n") {
 		t.Errorf("wrong content: %s", s)
 	}
+	sb.Reset()
+
+	pcl := PrefixedChanLogger(blgr, "")
+	if ptr, ok := pcl.(*chanLogger); !ok || ptr != nil {
+		t.Errorf("incompatible logger not detected: %T %v", pcl, pcl)
+	}
+
+	pcl.F(Emerg, "won't see this")
+	select {
+	case <-lch:
+		t.Fatal("nil F generated message")
+	default:
+	}
+
+	if pcl = PrefixedChanLogger(lgr, "pfx: "); pcl == nil {
+		t.Fatal("compatible logger not returned")
+	}
+	pcl.F(Error, fmt, "arg", 2)
+	m = <-lch
+	m.Emit()
+	if s := sb.String(); !strings.HasSuffix(s, " [E] pfx: format: arg 2\n") {
+		t.Errorf("wrong content: %s", s)
+	}
+	sb.Reset()
+
 }
