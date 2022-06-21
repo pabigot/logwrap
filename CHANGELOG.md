@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+## [v0.2.0] - 2022-06-21
+
+* Improve the examples.
+
+* Add PrefixedChanLogger which allows multiple loggers to supply log
+  message packages to the same channel for emission by the goroutine
+  that writes to the underlying log.
+
+* Add PriPr which provides a full set of short-hand bound priority Logf
+  functions.
+
 ## [v0.1.0] - 2022-03-22
 
 * Refactor interfaces to distinguish ImmutableLogger which is read-only
@@ -59,3 +70,4 @@
 [v0.0.6]: https://github.com/pabigot/logwrap/compare/v0.0.5...v0.0.6
 [v0.0.7]: https://github.com/pabigot/logwrap/compare/v0.0.6...v0.0.7
 [v0.1.0]: https://github.com/pabigot/logwrap/compare/v0.0.7...v0.1.0
+[v0.2.0]: https://github.com/pabigot/logwrap/compare/v0.1.0...v0.2.0
