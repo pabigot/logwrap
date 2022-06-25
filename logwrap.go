@@ -26,11 +26,17 @@ import (
 // Priority distinguishes log message priority.  Higher priority messages have
 // lower numeric value.  Priority levels derive from the classic syslog(3)
 // taxonomy.
+//
+// This type implements encoding.TextMarshaler, encoding.TextUnmarshaler,
+// flag.Value, and fmt.Stringer, to make it easier to pass priorities to the
+// application through flags or text configuration files.
 type Priority int32
 
 const (
+	unsetPriority Priority = iota
+
 	// Emerg means the system is unusable
-	Emerg Priority = iota
+	Emerg
 	// Crit identifies critical conditions
 	Crit
 	// Error conditions
@@ -112,6 +118,25 @@ func (p *Priority) Set(s string) (err error) {
 		err = fmt.Errorf("%w: %s", ErrInvalidPriority, s)
 	}
 	return
+}
+
+// IsSet indicates whether the priority has been defined.  This is useful in
+// validating unmarshalled types where a priority value may have been
+// specified in the marshalled data.  Unset priorities should be set to
+// Warning or an application-specific default.
+func (p Priority) IsSet() bool {
+	return unsetPriority != p
+}
+
+func (p Priority) MarshalText() ([]byte, error) {
+	if !p.IsSet() {
+		return nil, ErrInvalidPriority
+	}
+	return []byte(p.String()), nil
+}
+
+func (p *Priority) UnmarshalText(text []byte) error {
+	return p.Set(string(text))
 }
 
 // Enables returns true if and only if a logger set to the receiver's priority

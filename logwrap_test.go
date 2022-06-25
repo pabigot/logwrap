@@ -4,6 +4,7 @@
 package logwrap
 
 import (
+	"encoding"
 	"errors"
 	"fmt"
 	"log"
@@ -117,6 +118,38 @@ func TestParsePriority(t *testing.T) {
 	}
 	if _, ok := ParsePriority("wrn"); ok {
 		t.Error("Improper success")
+	}
+}
+
+func TestMarshalPriority(t *testing.T) {
+	var p Priority
+	if p.IsSet() {
+		t.Fatal("uninitialized priority is set")
+	}
+
+	_ = encoding.TextMarshaler(&p)
+	_ = encoding.TextUnmarshaler(&p)
+
+	_, err := p.MarshalText()
+	confirmError(t, err, ErrInvalidPriority, "invalid priority")
+
+	err = p.UnmarshalText([]byte("info"))
+	if err != nil {
+		t.Fatalf("unmarshal info: %s", err.Error())
+	}
+	if p != Info {
+		t.Fatalf("unmarshall wrong: %s", p)
+	}
+
+	err = p.UnmarshalText([]byte("important"))
+	confirmError(t, err, ErrInvalidPriority, "invalid priority: important")
+
+	b, err := p.MarshalText()
+	if err != nil {
+		t.Fatalf("marshal failed: %s", err.Error())
+	}
+	if v := string(b); v != p.String() {
+		t.Fatalf("marshal failed: %s != %s", p, v)
 	}
 }
 
