@@ -1,10 +1,15 @@
 // Copyright 2021-2022 Peter Bigot Consulting, LLC
 // SPDX-License-Identifier: Apache-2.0
 
-// Package logwrap provides a very basic abstraction supporting syslog-style
-// filterable prioritized string messages.  Logger instances can be created
-// for specific objects or roles, and can specify an identifier for
-// themselves.
+// Package logwrap provides a very basic logging abstraction supporting
+// syslog-style filterable prioritized text messages.  The underlying log
+// implementation is injected by providing a wrapper object that implements
+// Logger.  Logger instances can be created for specific objects or roles, and
+// can specify an identifier for themselves.
+//
+// Where the underlying log infrastructure is not safe for concurrent use,
+// MakeChanLogger allows multiple goroutines to send messages through a
+// channel to a goroutine that exclusively uses the logger.
 //
 // The use case is helper packages that should emit log messages with the
 // same tool as the application itself.
