@@ -51,26 +51,6 @@ var (
 	ErrInvalidPriority = errors.New("invalid priority")
 )
 
-func (p Priority) String() string {
-	switch p {
-	case Emerg:
-		return "Emerg"
-	case Crit:
-		return "Crit"
-	case Error:
-		return "Error"
-	case Warning:
-		return "Warning"
-	case Notice:
-		return "Notice"
-	case Info:
-		return "Info"
-	case Debug:
-		return "Debug"
-	}
-	panic("unhandled Priority")
-}
-
 // ParsePriority accepts strings of any case corresponding to Priority
 // identifiers and returns the corresponding Priority value paired with true.
 // If the string does not identify a priority the returned boolean will be
@@ -100,6 +80,36 @@ func ParsePriority(s string) (pri Priority, ok bool) {
 		pri = Info
 	case "debug":
 		pri = Debug
+	}
+	return
+}
+
+func (p Priority) String() string {
+	switch p {
+	case Emerg:
+		return "Emerg"
+	case Crit:
+		return "Crit"
+	case Error:
+		return "Error"
+	case Warning:
+		return "Warning"
+	case Notice:
+		return "Notice"
+	case Info:
+		return "Info"
+	case Debug:
+		return "Debug"
+	}
+	panic("unhandled Priority")
+}
+
+// Set a priority variable from a string.  This supports flag.Value.
+func (p *Priority) Set(s string) (err error) {
+	if pri, ok := ParsePriority(s); ok {
+		*p = pri
+	} else {
+		err = fmt.Errorf("%w: %s", ErrInvalidPriority, s)
 	}
 	return
 }
@@ -277,16 +287,6 @@ func LogLogMaker(interface{}) Logger {
 		lgr: log.New(os.Stderr, "", log.LstdFlags),
 		pri: Warning,
 	}
-}
-
-// Set a priority variable from a string.  This supports flag.Value.
-func (p *Priority) Set(s string) (err error) {
-	if pri, ok := ParsePriority(s); ok {
-		*p = pri
-	} else {
-		err = fmt.Errorf("%w: %s", ErrInvalidPriority, s)
-	}
-	return
 }
 
 var priMap = map[Priority]string{
