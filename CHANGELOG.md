@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [v0.3.0] - 2022-06-25
+
+* Add encoding TextMarshal/TextUnmarshal for Priority to simplify
+  controlling default log levels from configuration files.
+
 ## [v0.2.0] - 2022-06-21
 
 * Improve the examples.
@@ -71,3 +76,4 @@
 [v0.0.7]: https://github.com/pabigot/logwrap/compare/v0.0.6...v0.0.7
 [v0.1.0]: https://github.com/pabigot/logwrap/compare/v0.0.7...v0.1.0
 [v0.2.0]: https://github.com/pabigot/logwrap/compare/v0.1.0...v0.2.0
+[v0.3.0]: https://github.com/pabigot/logwrap/compare/v0.2.0...v0.3.0
